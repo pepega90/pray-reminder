@@ -1,0 +1,92 @@
+﻿@page "/"
+
+<div class="container d-flex align-items-center justify-content-center vh-100">
+    <div class="card bg-light text-dark" style="width: 80%; max-width: 800px; padding: 30px; border: 5px solid #000; box-shadow: 8px 8px 0 #ff0055;">
+        <div class="card-body text-center">
+            <h1 class="card-title fs-1 mb-4" id="clock" style="font-weight: 900; text-transform: uppercase; color: #333;">
+            </h1>
+            <p class="card-text fs-5" style="font-weight: bold; color: #ff0055;">
+                Hari/Tanggal: <span id="date">@Tanggal</span>
+            </p>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <label for="region" class="form-label fs-4" style="font-weight: 900; color: #000;">
+                    Pilih Wilayah:
+                </label>
+                <input id="region"
+                       type="text"
+                       class="form-control form-control-lg"
+                       placeholder="Cari Wilayah..."
+                       style="border: 3px solid #000; box-shadow: 4px 4px 0 #ff0055;"
+                       value="@SearchKota"
+                       @oninput="HandleSuggestion" />
+                <div class="mb-4 position-relative">
+                    <div id="suggestions" class="absolute w-full bg-white border border-black mt-1 shadow-[4px_4px_0px_#ff0055] rounded-lg"
+                         style="z-index: 1000; display: @(string.IsNullOrEmpty(SearchKota) ? "none" : (FilteredKota.Any() ? "block" : "none")); max-height: 200px; overflow-y: auto;">
+                        @foreach (var kota in FilteredKota)
+                        {
+                            <div class="p-2 border-b border-gray-200 hover:bg-pink-300 hover:text-white transition duration-150 ease-in-out"
+                                 style="cursor:pointer;"
+                                 @onclick="(() => SelectKota(kota))">
+                                @kota.Lokasi
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <h2 class="fs-4 mb-4" style="font-weight: 900; text-transform: uppercase;">
+                Wilayah: <span id="selected-region" style="color: #333;">
+                    @(SingleJadwal != null ? SingleJadwal.Lokasi : "Data not available")
+                </span>
+            </h2>
+            @if (SingleJadwal?.Jadwal != null)
+            {
+                <div class="row text-center g-4">
+                    @foreach (var (label, value, id) in new[] {
+                        ("Imsak", SingleJadwal.Jadwal.Imsak, "imsak"),
+                        ("Subuh", SingleJadwal.Jadwal.Subuh, "subuh"),
+                        ("Terbit", SingleJadwal.Jadwal.Terbit, "terbit"),
+                        ("Dhuha", SingleJadwal.Jadwal.Dhuha, "dhuha"),
+                        ("Dzuhur", SingleJadwal.Jadwal.Dzuhur, "dzuhur"),
+                        ("Ashar", SingleJadwal.Jadwal.Ashar, "ashar"),
+                        ("Maghrib", SingleJadwal.Jadwal.Maghrib, "maghrib"),
+                        ("Isya", SingleJadwal.Jadwal.Isya, "isya")
+                    })
+                    {
+                        <div class="col-6 col-md-3" style="border: 2px solid #000; padding: 10px; box-shadow: 4px 4px 0 #000; background-color: #ff0055;">
+                            <p class="mb-1 fs-5" style="color: #fff;">@label</p>
+                            <p class="fw-bold fs-4" id="@id" style="color: #000;">@value</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <footer class="text-center mt-4">
+            <p class="text-muted fs-5">
+                Made with <span style="color: #e25555;">&hearts;</span> by Aji Mustofa
+            </p>
+        </footer>
+    </div>
+</div>
+
+
+<script>
+    function updateClock() {
+        let now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+
+        hours = (hours < 10) ? "0" + hours : hours;
+        minutes = (minutes < 10) ? "0" + minutes : minutes;
+        seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+        let timeString = "UTC+7 | " + hours + ":" + minutes + ":" + seconds + " WIB";
+        document.getElementById("clock").innerText = timeString;
+
+        setTimeout(updateClock, 1000);
+    }
+
+    updateClock();
+</script>
